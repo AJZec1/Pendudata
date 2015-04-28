@@ -1,33 +1,79 @@
+import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
 import math
+
+def func(x, a, b, c):
+    return a * np.exp(-b * x) + c
 
 def analyze():
 	c5 = open('chaos5.txt').readlines()
-	c6 = open('chaos6.txt').readlines()
+	c7 = open('chaos7.csv').readlines()
 
-	t, x_inner, y_inner, v_inner, theta_inner, omega_inner, x_outer, y_outer, v_outer, theta_outer, omega_outer = [],[],[],[],[],[],[],[],[],[],[]
+	t_5, x_inner_5, y_inner_5, v_inner_5, theta_inner_5, omega_inner_5, x_outer_5, y_outer_5, v_outer_5, theta_outer_5, omega_outer_5 = [],[],[],[],[],[],[],[],[],[],[]
+	t_7, x_inner_7, y_inner_7, v_inner_7, theta_inner_7, omega_inner_7, x_outer_7, y_outer_7, v_outer_7, theta_outer_7, omega_outer_7 = [],[],[],[],[],[],[],[],[],[],[]
 
+	ti = 0
 	for line in c5:
 		if 't' in line: continue
 		terms = line.split('\t')
-		t.append(float(terms[0])); 
-		x_inner.append(float(terms[1])); y_inner.append(float(terms[2])); v_inner.append(float(terms[3])); theta_inner.append(float(terms[4])); omega_inner.append(float(terms[5]))
-		x_outer.append(float(terms[6])); y_outer.append(float(terms[8])); v_outer.append(float(terms[7])); theta_outer.append(float(terms[9])); omega_outer.append(float(terms[10]))
+		if len(t_5) == 0:
+			ti = float(terms[0])
+		t_5.append(float(terms[0]) - ti); 
+		x_inner_5.append(float(terms[1])); y_inner_5.append(float(terms[2])); v_inner_5.append(float(terms[3])); theta_inner_5.append(float(terms[4])); omega_inner_5.append(float(terms[5]))
+		x_outer_5.append(float(terms[6])); y_outer_5.append(float(terms[8])); v_outer_5.append(float(terms[7])); theta_outer_5.append(float(terms[9])); omega_outer_5.append(float(terms[10]))
 
-	cum_theta_inner, cum_theta_outer = [], []
+	for line in c7:
+		if 't' in line: continue
+		terms = line.split(',')
+		if len(t_7) == 0:
+			ti = float(terms[0])
+		t_7.append(float(terms[0]) - ti); 
+		x_inner_7.append(float(terms[1])); y_inner_7.append(float(terms[2])); v_inner_7.append(float(terms[3])); theta_inner_7.append(float(terms[4])); omega_inner_7.append(float(terms[5]))
+		x_outer_7.append(float(terms[6])); y_outer_7.append(float(terms[8])); v_outer_7.append(float(terms[7])); theta_outer_7.append(float(terms[9])); omega_outer_7.append(float(terms[10]))
 
-	for n,angle in enumerate(theta_outer):
-		if n == 0: cum_theta_outer.append(angle); continue
+	cum_theta_inner_5, cum_theta_outer_5 = [], []
+	cum_theta_inner_7, cum_theta_outer_7 = [], []
 
-		angle_diff = theta_outer[n] - theta_outer[n-1]
-		if theta_outer[n] > 5.5 and theta_outer[n-1] < 0.5:
+	for n,angle in enumerate(theta_outer_5):
+		if n == 0: cum_theta_outer_5.append(angle); continue
+
+		angle_diff = theta_outer_5[n] - theta_outer_5[n-1]
+		if theta_outer_5[n] > 5.5 and theta_outer_5[n-1] < 0.5:
 			angle_diff -= 2*math.pi
-		elif theta_outer[n] < 0.5 and theta_outer[n-1] > 5.5:
+		elif theta_outer_5[n] < 0.5 and theta_outer_5[n-1] > 5.5:
 			angle_diff += 2*math.pi
 
-		cum_theta_outer.append(angle_diff + cum_theta_outer[n-1])
+		cum_theta_outer_5.append(angle_diff + cum_theta_outer_5[n-1])
 
-	plt.plot(t, cum_theta_outer)
+	for n,angle in enumerate(theta_outer_7):
+		if n == 0: cum_theta_outer_7.append(angle); continue
+
+		angle_diff = theta_outer_7[n] - theta_outer_7[n-1]
+		if theta_outer_7[n] > 5.5 and theta_outer_7[n-1] < 0.5:
+			angle_diff -= 2*math.pi
+		elif theta_outer_7[n] < 0.5 and theta_outer_7[n-1] > 5.5:
+			angle_diff += 2*math.pi
+
+		cum_theta_outer_7.append(angle_diff + cum_theta_outer_7[n-1])
+
+	t_div, divergence = [], []
+
+	for n,angle in enumerate(cum_theta_outer_5):
+		t_div.append(t_5[n])
+		divergence.append(abs(cum_theta_outer_5[n] - cum_theta_outer_7[n]))
+		if t_5[n] >= 3.0: break
+
+	#plt.plot(t_5, cum_theta_outer_5, 'b-', t_7, cum_theta_outer_7, 'r-')
+
+	f = open('divergence.txt','w+')
+
+	for n,val in enumerate(t_div):
+		f.write(str(t_div[n])+','+str(divergence[n])+'\n')
+
+	f.close()
+
+	plt.plot(t_div,divergence)
 	plt.show()
 
 analyze()
