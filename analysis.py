@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+import matplotlib
 import math
 
 def func(x, a, b, c):
@@ -21,7 +22,7 @@ def analyze():
 			ti = float(terms[0])
 		t_5.append(float(terms[0]) - ti); 
 		x_inner_5.append(float(terms[1])); y_inner_5.append(float(terms[2])); v_inner_5.append(float(terms[3])); theta_inner_5.append(float(terms[4])); omega_inner_5.append(float(terms[5]))
-		x_outer_5.append(float(terms[6])); y_outer_5.append(float(terms[8])); v_outer_5.append(float(terms[7])); theta_outer_5.append(float(terms[9])); omega_outer_5.append(float(terms[10]))
+		x_outer_5.append(float(terms[6])); y_outer_5.append(float(terms[7])); v_outer_5.append(float(terms[8])); theta_outer_5.append(float(terms[9])); omega_outer_5.append(float(terms[10]))
 
 	for line in c7:
 		if 't' in line: continue
@@ -30,7 +31,7 @@ def analyze():
 			ti = float(terms[0])
 		t_7.append(float(terms[0]) - ti); 
 		x_inner_7.append(float(terms[1])); y_inner_7.append(float(terms[2])); v_inner_7.append(float(terms[3])); theta_inner_7.append(float(terms[4])); omega_inner_7.append(float(terms[5]))
-		x_outer_7.append(float(terms[6])); y_outer_7.append(float(terms[8])); v_outer_7.append(float(terms[7])); theta_outer_7.append(float(terms[9])); omega_outer_7.append(float(terms[10]))
+		x_outer_7.append(float(terms[6])); y_outer_7.append(float(terms[7])); v_outer_7.append(float(terms[8])); theta_outer_7.append(float(terms[9])); omega_outer_7.append(float(terms[10]))
 
 	cum_theta_inner_5, cum_theta_outer_5 = [], []
 	cum_theta_inner_7, cum_theta_outer_7 = [], []
@@ -73,7 +74,64 @@ def analyze():
 
 	f.close()
 
-	plt.plot(t_div,divergence)
+	fig = plt.figure()
+	plot = fig.add_subplot(111)
+	plot.plot(t_div,divergence)
+	plot.set_xlabel('time (s)', fontsize=20)
+	plot.set_ylabel('angle difference', fontsize=20)
+	plot.tick_params(axis='both', which='major', labelsize=20)
+	plot.tick_params(axis='both', which='minor', labelsize=20)
+
+	fig = plt.figure()
+	plot = fig.add_subplot(111)
+	plot.plot(t_5, cum_theta_outer_5, 'b-', label='Chaos5') 
+	plot.plot(t_7, cum_theta_outer_7, 'r-', label='Chaos7')
+	plot.set_xlabel('time (s)', fontsize=20)
+	plot.set_ylabel('Cumulative Angle', fontsize=20)
+	plot.tick_params(axis='both', which='major', labelsize=20)
+	plot.tick_params(axis='both', which='minor', labelsize=20)
+	plot.legend()
+
+	fig = plt.figure()
+	plot = fig.add_subplot(111)
+	plot.plot(x_inner_5, y_inner_5, 'b-', label='Chaos5') 
+	plot.plot(x_inner_7, y_inner_7, 'r-', label='Chaos7')
+	plot.set_xlabel('inner x', fontsize=20)
+	plot.set_ylabel('inner y', fontsize=20)
+	plot.tick_params(axis='both', which='major', labelsize=20)
+	plot.tick_params(axis='both', which='minor', labelsize=20)
+	plot.legend()
+
+	fig = plt.figure()
+	plot = fig.add_subplot(111)
+	plot.plot(x_outer_5, y_outer_5, 'b-', label='Chaos5') 
+	plot.plot(x_outer_7, y_outer_7, 'r-', label='Chaos7')
+	plot.set_xlabel('outer x', fontsize=20)
+	plot.set_ylabel('outer y', fontsize=20)
+	plot.tick_params(axis='both', which='major', labelsize=20)
+	plot.tick_params(axis='both', which='minor', labelsize=20)
+	plot.legend()
+
+	fig = plt.figure()
+	plot = fig.add_subplot(111)
+	plot.plot(theta_inner_5, omega_inner_5, 'b,', label='Chaos5') 
+	plot.plot(theta_inner_7, omega_inner_7, 'r,', label='Chaos7')
+	plot.set_xlabel('inner theta', fontsize=20)
+	plot.set_ylabel('inner omega', fontsize=20)
+	plot.tick_params(axis='both', which='major', labelsize=20)
+	plot.tick_params(axis='both', which='minor', labelsize=20)
+	plot.legend()
+
+	fig = plt.figure()
+	plot = fig.add_subplot(111)
+	plot.plot(theta_outer_5, omega_outer_5, 'b,', label='Chaos5') 
+	plot.plot(theta_outer_7, omega_outer_7, 'r,', label='Chaos7')
+	plot.set_xlabel('outer theta', fontsize=20)
+	plot.set_ylabel('outer omega', fontsize=20)
+	plot.tick_params(axis='both', which='major', labelsize=20)
+	plot.tick_params(axis='both', which='minor', labelsize=20)
+	plot.legend()
+
 	plt.show()
 
 analyze()
